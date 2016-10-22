@@ -1,0 +1,25 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>U2F PoC Demo</title>
+<script src="redux.js"></script>
+<script src="client-app.js"></script>
+<style>
+  code {
+    word-wrap: break-word;
+  }
+</style>
+<div id="root">
+  <div id="home">
+    <div>You have registered <span id="how-many"></span></div><ul id="list"></ul>
+    <button onclick="store.dispatch({type:'ADD'})">Add New U2F Key</button>
+    <button onclick="store.dispatch({type:'AUTH'})">Authenticate</button>
+    <p id="msg"></p>
+  </div>
+  <div id="add">Please insert your new U2F key and press the button if it has one.</div>
+  <div id="auth">Please insert your U2F key and press the button if it has one.</div>
+</div>
+<script>
+
+store.dispatch({ type: '' });
+
+</script>

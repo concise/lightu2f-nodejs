@@ -1,0 +1,61 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>test</title>
+
+<!-- Buffer -->
+<script src="buffer.js"></script><script>const { Buffer } = buffer;</script>
+
+<!-- assert -->
+<script>const assert = (expr) => { if (!expr) throw new Error('assert fails'); };</script>
+
+<script>
+
+const DER_decode_one_something = function (octets) {
+    const [T, tail1] = DER_extract_identifier_octets(octets);
+    const [L, tail2] = DER_extract_length_octets(tail1);
+    const V_length = DER_decode_length_octets(L);
+    const [V, tail3] = [tail2.slice(0, V_length), tail2.slice(V_length)];
+    return [T, L, V, tail3];
+};
+
+const DER_extract_identifier_octets = function (stream) {
+    // TODO consider the situation where identifier octets contain more octets
+    return [stream.slice(0, 1), stream.slice(1)];
+};
+
+const DER_extract_length_octets = function (stream) {
+    try {
+        assert(stream.length >= 1);
+        if (stream[0] >> 7 === 0) {
+            return [stream.slice(0, 1), stream.slice(1)];
+        } else {
+            const l = stream[0] & 0b01111111;
+            assert(1 <= l && l <= 126);
+            assert(stream.length >= l + 1);
+            assert((l === 1 && stream[1] >= 128) || (l > 1 && stream[1] != 0));
+            return [stream.slice(0, l + 1), stream.slice(l + 1)];
+        }
+    } catch (_) {
+        throw new Error('invalid DER length octets');
+    }
+};
+
+const DER_decode_length_octets = function (length_octets) {
+    if (length_octets[0] < 128) {
+        return length_octets[0];
+    }
+
+    length_octets = length_octets.slice(1);
+
+    if (length_octets.length > 3) {
+        throw new Error('invalid DER length octets');  // TODO
+    }
+
+    let ret = 0;
+    for (let i = 0; i < length_octets.length; ++i) {
+        ret = (ret << 8) | length_octets[i];
+    }
+    return ret;
+};
+
+</script>
